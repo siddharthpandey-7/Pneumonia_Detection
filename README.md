@@ -1,25 +1,21 @@
-🩺 Pneumonia Detection using Deep Learning (VGG19 + Flask Web App)
+# 🩺 Pneumonia Detection using Deep Learning (VGG19 + Flask Web App)
 
-An AI-powered web application that detects Pneumonia from Chest X-ray images using a fine-tuned VGG19 Convolutional Neural Network (CNN).
-The model was trained on the Chest X-Ray Images (Pneumonia)
- dataset from Kaggle and integrated into a Flask web application for real-time image-based diagnosis.
+An AI-powered web application that detects **Pneumonia from Chest X-ray images** using a fine-tuned **VGG19 Convolutional Neural Network (CNN)**.  
+The model was trained on the [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia) dataset from Kaggle and integrated into a **Flask web application** for real-time image-based diagnosis.
 
-🚀 Features
+---
 
-✅ Deep Learning–based Pneumonia detection (VGG19 Transfer Learning)
+## 🚀 Features
+- ✅ Deep Learning–based Pneumonia detection (VGG19 Transfer Learning)
+- 🧠 Fine-tuned with high test accuracy
+- 🧩 Real-time image upload and prediction using Flask
+- 📸 Beautiful front-end with live preview & loading animation
+- 📊 Confidence score bar and colored prediction output
+- 💾 Model file excluded from GitHub for lightweight repo (Google Drive link provided)
 
-🧠 Fine-tuned with high test accuracy
+---
 
-🧩 Real-time image upload and prediction using Flask
-
-📸 Beautiful front-end with live preview & loading animation
-
-📊 Confidence score bar and colored prediction output
-
-💾 Model file excluded from GitHub for lightweight repo (Google Drive link provided)
-
-📂 Folder Structure
-
+## 📂 Folder Structure
 PNEUMONIA_DETECTION/
 │
 ├── static/
@@ -36,63 +32,55 @@ PNEUMONIA_DETECTION/
 ├── .gitignore # Files/folders ignored in Git
 └── README.md # Project documentation
 
-🧠 Model Overview
 
-Base Model: VGG19 (pretrained on ImageNet)
+---
 
-Approach: Transfer learning + fine-tuning last convolutional blocks
+## 🧠 Model Overview
+- **Base Model:** VGG19 (pretrained on ImageNet)
+- **Approach:** Transfer learning + fine-tuning last convolutional blocks  
+- **Input Size:** 128×128 RGB images  
+- **Optimizer:** Adam (lr = 1e-4 → fine-tuned at 1e-5)  
+- **Loss Function:** Categorical Crossentropy  
+- **Epochs:** 20 (base) + 10 (fine-tune)  
+- **Accuracy:** ~95% on test data  
+- **Output Classes:** `NORMAL`, `PNEUMONIA`
 
-Input Size: 128×128 RGB images
+---
 
-Optimizer: Adam (lr = 1e-4 → fine-tuned at 1e-5)
+## 🧬 Dataset
+**Dataset Used:** [Chest X-Ray Images (Pneumonia) – Kaggle](https://www.kaggle.com/paultimothymooney/chest-xray-pneumonia)  
+- Training, Validation, and Test splits provided  
+- Data Augmentation applied using `ImageDataGenerator`
 
-Loss Function: Categorical Crossentropy
+---
 
-Epochs: 20 (base) + 10 (fine-tune)
+## 🧠 Download Trained Model
+The trained model (`best_vgg19_pneumonia.h5`) is **not uploaded to GitHub** due to file size limits.  
 
-Accuracy: ~95% on test data
-
-Output Classes: NORMAL, PNEUMONIA
-
-🧬 Dataset
-
-Dataset Used: Chest X-Ray Images (Pneumonia) – Kaggle
-
-Training, Validation, and Test splits provided
-
-Data Augmentation applied using ImageDataGenerator
-
-🧠 Download Trained Model
-
-The trained model (best_vgg19_pneumonia.h5) is not uploaded to GitHub due to file size limits.
-
-➡️ Download it from Google Drive:
+➡️ **Download it from Google Drive:**  
 👉 [Insert your Google Drive model link here]
 
-Once downloaded, place the file in your project root folder next to app.py.
+> Once downloaded, place the file in your project root folder next to `app.py`.
 
-⚙️ Installation & Setup
-1️⃣ Clone the Repository
+---
 
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone the Repository
+```bash
 git clone https://github.com/your-username/Pneumonia_Detection.git
-
 cd Pneumonia_Detection
 
 2️⃣ Create a Virtual Environment (optional)
-
 python -m venv venv
-venv\Scripts\activate # For Windows
-
-OR
-
+venv\Scripts\activate    # For Windows
+# OR
 source venv/bin/activate # For Mac/Linux
 
 3️⃣ Install Dependencies
-
 pip install -r requirements.txt
 
 4️⃣ Run the Application
-
 python app.py
 
 Then open your browser and go to:
@@ -131,7 +119,7 @@ uploads/
 *.pkl
 *.pt
 *.joblib
-pycache/
+__pycache__/
 *.ipynb_checkpoints
 dataset/
 data/
