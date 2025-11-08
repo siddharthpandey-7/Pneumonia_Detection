@@ -55,8 +55,7 @@ TensorFlow 2.18.0
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/pneumonia-detection.git
-   cd pneumonia-detection
+   git clone https://github.com/siddharthpandey-7/Pneumonia-Detection-Using-Deep-Learning.git
    ```
 
 2. **Create virtual environment**
