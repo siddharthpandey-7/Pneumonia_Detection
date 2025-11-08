@@ -7,17 +7,20 @@ import numpy as np
 
 app = Flask(__name__)
 
+# Folder for uploaded images
 UPLOAD_FOLDER = 'static/uploads/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-# ✅ Hugging Face model link
+# ✅ Hugging Face model URL (you uploaded this)
 MODEL_URL = "https://huggingface.co/siddharthpandey7/pneumonia-model/resolve/main/best_vgg19_pneumonia.h5"
 MODEL_PATH = "best_vgg19_pneumonia.h5"
 
-# 🔹 Step 1: Download model from Hugging Face if not present
+
+# --- Download model if not found locally ---
 def download_model():
+    print("🧠 Checking for model...")
     if not os.path.exists(MODEL_PATH):
-        print("🧠 Downloading model from Hugging Face...")
+        print("⏬ Model not found locally. Downloading from Hugging Face...")
         response = requests.get(MODEL_URL, stream=True)
         if response.status_code == 200:
             with open(MODEL_PATH, "wb") as f:
@@ -25,22 +28,32 @@ def download_model():
                     f.write(chunk)
             print("✅ Model downloaded successfully!")
         else:
-            raise Exception(f"❌ Failed to download model. Status code: {response.status_code}")
+            raise Exception(f"❌ Model download failed! HTTP {response.status_code}")
+    else:
+        print("✅ Model already exists locally.")
 
-download_model()
 
-# 🔹 Step 2: Load model
-print("🔄 Loading model...")
-model = load_model(MODEL_PATH)
-print("✅ Model loaded successfully!")
+# --- Load model safely ---
+def load_trained_model():
+    download_model()
+    print("🔄 Loading model...")
+    model = load_model(MODEL_PATH)
+    print("✅ Model loaded successfully!")
+    return model
 
-# 🔹 Step 3: Class names
+
+# Load model once at startup
+model = load_trained_model()
+
+# --- Class names ---
 class_names = ['NORMAL', 'PNEUMONIA']
 
-# 🔹 Step 4: Routes
+
+# --- Routes ---
 @app.route('/')
 def home():
     return render_template('index.html')
+
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -65,6 +78,6 @@ def predict():
                            prediction=predicted_class,
                            confidence=confidence)
 
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=5000)
