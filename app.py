@@ -1,83 +1,58 @@
 import os
 import requests
 from flask import Flask, render_template, request
+import tensorflow as tf
 from tensorflow.keras.models import load_model
-from tensorflow.keras.preprocessing import image
+from PIL import Image
 import numpy as np
 
 app = Flask(__name__)
 
-# Folder for uploaded images
-UPLOAD_FOLDER = 'static/uploads/'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
-# ✅ Hugging Face model URL (you uploaded this)
 MODEL_URL = "https://huggingface.co/siddharthpandey7/pneumonia-model/resolve/main/best_vgg19_pneumonia.h5"
 MODEL_PATH = "best_vgg19_pneumonia.h5"
 
-
-# --- Download model if not found locally ---
+# ------------------ DOWNLOAD MODEL --------------------
 def download_model():
-    print("🧠 Checking for model...")
-    if not os.path.exists(MODEL_PATH):
-        print("⏬ Model not found locally. Downloading from Hugging Face...")
+    if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 100000:
+        print("✅ Downloading model from Hugging Face...")
         response = requests.get(MODEL_URL, stream=True)
+
         if response.status_code == 200:
             with open(MODEL_PATH, "wb") as f:
-                for chunk in response.iter_content(1024 * 1024):
-                    f.write(chunk)
+                for chunk in response.iter_content(chunk_size=8192):
+                    if chunk:
+                        f.write(chunk)
             print("✅ Model downloaded successfully!")
         else:
-            raise Exception(f"❌ Model download failed! HTTP {response.status_code}")
-    else:
-        print("✅ Model already exists locally.")
+            raise Exception("❌ ERROR: Failed to download model from Hugging Face.")
 
+# ------------------ LOAD MODEL --------------------
+download_model()
 
-# --- Load model safely ---
-def load_trained_model():
-    download_model()
-    print("🔄 Loading model...")
+try:
     model = load_model(MODEL_PATH)
-    print("✅ Model loaded successfully!")
-    return model
+    print("✅ Loaded model successfully!")
+except Exception as e:
+    print("❌ Error loading model:", e)
+    raise e
 
+# ------------------ ROUTES --------------------
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-# Load model once at startup
-model = load_trained_model()
-
-# --- Class names ---
-class_names = ['NORMAL', 'PNEUMONIA']
-
-
-# --- Routes ---
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["POST"])
 def predict():
-    if 'file' not in request.files:
-        return "No file uploaded", 400
-    file = request.files['file']
-    if file.filename == '':
-        return "No file selected", 400
+    file = request.files["image"]
+    img = Image.open(file).convert("RGB").resize((224, 224))
+    img = np.array(img) / 255.0
+    img = np.expand_dims(img, axis=0)
 
-    filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-    file.save(filepath)
+    prediction = model.predict(img)[0][0]
 
-    img = image.load_img(filepath, target_size=(128, 128))
-    img_array = np.expand_dims(image.img_to_array(img), axis=0) / 255.0
+    result = "PNEUMONIA DETECTED" if prediction > 0.5 else "NORMAL"
 
-    prediction = model.predict(img_array)
-    predicted_class = class_names[np.argmax(prediction[0])]
-    confidence = round(100 * np.max(prediction[0]), 2)
-
-    return render_template('result.html',
-                           filename=file.filename,
-                           prediction=predicted_class,
-                           confidence=confidence)
-
+    return render_template("result.html", result=result)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True)
