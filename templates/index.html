@@ -3,69 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pneumonia Detection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e90ff, #87cefa);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-        }
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-        form {
-            background: white;
-            color: black;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        input[type="file"] {
-            padding: 8px;
-            margin: 10px 0;
-            border: 2px solid #1e90ff;
-            border-radius: 10px;
-        }
-        button {
-            background: #1e90ff;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: 0.3s;
-        }
-        button:hover {
-            background: #0d6efd;
-        }
-        .loading {
-            display: none;
-            color: #333;
-            margin-top: 10px;
-        }
-    </style>
+    <title>Pneumonia Detection | AI Medical Scan</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>🩺 Pneumonia Detection</h1>
+    <div class="container">
+        <h1 class="title">🩺 Pneumonia Detection System</h1>
+        <p class="subtitle">Upload a chest X-ray image and let our AI model detect if pneumonia is present.</p>
 
-    <form action="/predict" method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
-        <input type="file" name="file" accept="image/*" required><br>
-        <button type="submit">Analyze Image</button>
-        <p class="loading" id="loading">⏳ Please wait... Analyzing image...</p>
-    </form>
+        <form action="/predict" method="post" enctype="multipart/form-data" class="upload-box" id="uploadForm">
+            <input type="file" name="file" id="fileInput" accept="image/*" required>
+            <div id="previewBox">
+                <img id="previewImage" src="#" alt="Image preview..." />
+            </div>
+            <button type="submit" class="btn">🔍 Analyze Image</button>
+        </form>
+
+        <div id="loading" class="loading hidden">
+            <div class="spinner"></div>
+            <p>Analyzing X-ray... please wait ⏳</p>
+        </div>
+    </div>
 
     <script>
-        function showLoading() {
-            document.getElementById("loading").style.display = "block";
-        }
+        const fileInput = document.getElementById("fileInput");
+        const previewImage = document.getElementById("previewImage");
+        const previewBox = document.getElementById("previewBox");
+        const form = document.getElementById("uploadForm");
+        const loading = document.getElementById("loading");
+
+        // Image preview
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            if (file) {
+                previewBox.style.display = "block";
+                const reader = new FileReader();
+                reader.onload = e => previewImage.src = e.target.result;
+                reader.readAsDataURL(file);
+            } else {
+                previewBox.style.display = "none";
+            }
+        });
+
+        // Show loader on submit
+        form.addEventListener("submit", () => {
+            loading.classList.remove("hidden");
+        });
     </script>
 </body>
 </html>
+
+
+

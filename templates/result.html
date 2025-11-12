@@ -3,58 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Result - Pneumonia Detection</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e90ff, #87cefa);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            color: white;
-        }
-        .result-box {
-            background: white;
-            color: black;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            text-align: center;
-        }
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-        .positive {
-            color: red;
-            font-weight: bold;
-        }
-        .negative {
-            color: green;
-            font-weight: bold;
-        }
-        a {
-            margin-top: 15px;
-            display: inline-block;
-            background: #1e90ff;
-            color: white;
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            transition: 0.3s;
-        }
-        a:hover {
-            background: #0d6efd;
-        }
-    </style>
+    <title>AI Scan Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="result-box">
-        <h1>🧠 Prediction Result</h1>
-        <p class="{{ 'positive' if 'DETECTED' in result else 'negative' }}">{{ result }}</p>
-        <a href="/">🔙 Try Another Image</a>
+    <div class="container">
+        <h1 class="title">🧠 Scan Result</h1>
+
+        <div class="result-box">
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded X-ray" class="result-img">
+
+            <div class="prediction-box">
+                <h2>Prediction: 
+                    <span class="prediction {{ 'positive' if prediction == 'PNEUMONIA' else 'negative' }}">
+                        {{ prediction }}
+                    </span>
+                </h2>
+                <div class="confidence-bar">
+                    <div class="fill" style="width: {{ confidence }}%"></div>
+                </div>
+                <p class="confidence-text">Confidence: {{ confidence }}%</p>
+            </div>
+        </div>
+
+        <a href="/" class="btn back-btn">⬅️ Scan Another Image</a>
     </div>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
