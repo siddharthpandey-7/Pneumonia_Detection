@@ -1,4 +1,5 @@
 import os
+import io
 import base64
 import requests
 from flask import Flask, render_template, request
@@ -13,7 +14,8 @@ MODEL_URL = "https://huggingface.co/siddharthpandey7/pneumonia-model/resolve/mai
 MODEL_PATH = "best_vgg19_pneumonia.h5"
 
 def download_model():
-    if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 200000:
+    """Download model from HuggingFace if not present."""
+    if not os.path.exists(MODEL_PATH) or os.path.getsize(MODEL_PATH) < 1000000:
         print("Downloading model from HuggingFace...")
         response = requests.get(MODEL_URL, stream=True)
         if response.status_code == 200:
@@ -24,6 +26,7 @@ def download_model():
         else:
             raise Exception("Failed to download model.")
 
+# ------------------ LOAD MODEL ------------------
 model = None
 def get_model():
     global model
@@ -49,14 +52,14 @@ def predict():
         return "No selected file", 400
 
     try:
-        # Convert image to RGB
+        # Load and preprocess image
         img = Image.open(file).convert("RGB")
         img_resized = img.resize((128, 128))
 
-        # Convert to array for prediction
         arr = np.array(img_resized) / 255.0
         arr = np.expand_dims(arr, axis=0)
 
+        # Predict
         model_instance = get_model()
         preds = model_instance.predict(arr)
 
@@ -64,10 +67,9 @@ def predict():
         result = "PNEUMONIA DETECTED" if prob > 0.5 else "NORMAL"
         confidence = round(prob * 100 if prob > 0.5 else (1 - prob) * 100, 2)
 
-        # Convert image to base64 to display directly
-        img_buffer = Image.open(file).convert("RGB")
+        # Convert uploaded image to base64
         buffer = io.BytesIO()
-        img_buffer.save(buffer, format="PNG")
+        img.save(buffer, format="PNG")
         img_encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
         img_data = f"data:image/png;base64,{img_encoded}"
 
